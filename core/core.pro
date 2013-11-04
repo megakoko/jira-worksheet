@@ -17,8 +17,8 @@ LIBS += -lqjson -L../bin
 INCLUDEPATH += ../qjson-master/include
 
 SOURCES += \
-    worksheetfetcher.cpp
+    datafetcher.cpp
 
 HEADERS +=\
         core_global.h \
-    worksheetfetcher.h
+    datafetcher.h

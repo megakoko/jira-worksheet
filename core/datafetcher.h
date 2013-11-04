@@ -8,11 +8,15 @@ class QNetworkAccessManager;
 class QNetworkReply;
 class QDate;
 
-class CORESHARED_EXPORT WorksheetFetcher : public QObject
+
+namespace JiraWorksheet
+{
+
+class CORESHARED_EXPORT DataFetcher : public QObject
 {
 	Q_OBJECT
 public:
-	WorksheetFetcher(const QString& jiraHost, QObject* parent = NULL);
+	DataFetcher(const QString& jiraHost, QObject* parent = NULL);
 
 	void setLogin(const QString& login) { m_login = login; }
 	void setPassword(const QString& password) { m_password = password; }
@@ -37,3 +41,4 @@ signals:
 
 };
 
+} // namespace

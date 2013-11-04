@@ -1,4 +1,4 @@
-#include "worksheetfetcher.h"
+#include "datafetcher.h"
 
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -7,10 +7,14 @@
 #include <QUrl>
 #include <QLocale>
 #include <QDebug>
+#include <QDateTime>
 
 #include <QJson/Parser>
 
-WorksheetFetcher::WorksheetFetcher(const QString &jiraHost, QObject* parent)
+namespace JiraWorksheet
+{
+
+DataFetcher::DataFetcher(const QString &jiraHost, QObject* parent)
 	: QObject(parent)
 	, m_manager(new QNetworkAccessManager(this))
 	, m_host(jiraHost)
@@ -18,7 +22,7 @@ WorksheetFetcher::WorksheetFetcher(const QString &jiraHost, QObject* parent)
 
 }
 
-void WorksheetFetcher::fetchWorksheet(const QDate &startDate, const QDate &endDate)
+void DataFetcher::fetchWorksheet(const QDate &startDate, const QDate &endDate)
 {
 	QUrl url;
 	url.setScheme("https");
@@ -47,8 +51,7 @@ void WorksheetFetcher::fetchWorksheet(const QDate &startDate, const QDate &endDa
 }
 
 
-#include <QDateTime>
-void WorksheetFetcher::processReply()
+void DataFetcher::processReply()
 {
 	QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
 	if (reply == NULL)
@@ -70,7 +73,7 @@ void WorksheetFetcher::processReply()
 	emit finished(replyIsValid);
 }
 
-bool WorksheetFetcher::processJson(const QByteArray& json)
+bool DataFetcher::processJson(const QByteArray& json)
 {
 	bool jsonIsValid = true;
 
@@ -100,3 +103,5 @@ bool WorksheetFetcher::processJson(const QByteArray& json)
 
 	return jsonIsValid;
 }
+
+} // namespace

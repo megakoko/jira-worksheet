@@ -11,6 +11,8 @@
 
 #include <QJson/Parser>
 
+#include "worklog.h"
+
 namespace JiraWorksheet
 {
 
@@ -83,22 +85,9 @@ bool DataFetcher::processJson(const QByteArray& json)
 
 	if (jsonIsValid)
 	{
-		QVariantList workLog = map.toMap().value("worklog").toList();
-	//	qDebug() << workLog << "\n";
-		foreach(QVariant issueVariant, workLog)
-		{
-			QVariantMap issue = issueVariant.toMap();
-			qDebug() << issue.value("key").toString();
-
-			foreach(QVariant entry, issue.value("entries").toList())
-			{
-				const qlonglong secs = entry.toMap().value("timeSpent").toLongLong();
-				const qlonglong mins = (secs / 60) % 60;
-				const qlonglong hrs = secs / 3600;
-				qDebug() << QDateTime::fromMSecsSinceEpoch(entry.toMap().value("updated").toLongLong())
-						 << hrs << "hrs" << mins << "minutes";
-			}
-		}
+		WorkLog log(map.toMap());
+		qDebug() << log.startDate << log.endDate;
+		qDebug() << log;
 	}
 
 	return jsonIsValid;

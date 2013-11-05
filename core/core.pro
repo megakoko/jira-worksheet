@@ -17,8 +17,10 @@ LIBS += -lqjson -L../bin
 INCLUDEPATH += ../qjson-master/include
 
 SOURCES += \
-    datafetcher.cpp
+    datafetcher.cpp \
+	worklog.cpp \
 
 HEADERS +=\
-        core_global.h \
-    datafetcher.h
+	core_global.h \
+    datafetcher.h \
+	worklog.h \

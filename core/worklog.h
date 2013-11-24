@@ -12,18 +12,19 @@ template<class T> class QList;
 
 namespace JiraWorksheet
 {
+typedef qlonglong time_t;
 
 struct CORESHARED_EXPORT Entry
 {
 public:
-	Entry(const QString& comment, const qlonglong& timeSpent,
-		  const qlonglong& timeUpdated, const qlonglong& timeCreated,
+	Entry(const QString& comment, const time_t& timeSpent,
+		  const time_t& timeUpdated, const time_t& timeCreated,
 		  const QString& authorUpdated, const QString& authorCreated);
 
-	static QString formatTimeSpent(const qlonglong timeSpent);
+	static QString formatTimeSpent(const time_t timeSpent);
 
 	const QString comment;
-	const qlonglong timeSpent;
+	const time_t timeSpent;
 
 	const QDateTime timeUpdated;
 	const QDateTime timeCreated;

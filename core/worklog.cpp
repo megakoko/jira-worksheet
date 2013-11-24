@@ -6,8 +6,8 @@
 namespace JiraWorksheet
 {
 
-Entry::Entry(const QString& comment, const qlonglong& timeSpent,
-			 const qlonglong& timeUpdated, const qlonglong& timeCreated,
+Entry::Entry(const QString& comment, const time_t& timeSpent,
+			 const time_t& timeUpdated, const time_t& timeCreated,
 			 const QString& authorUpdated, const QString& authorCreated)
 	: comment(comment)
 	, timeSpent(timeSpent)
@@ -18,10 +18,10 @@ Entry::Entry(const QString& comment, const qlonglong& timeSpent,
 {
 }
 
-QString Entry::formatTimeSpent(const qlonglong timeSpent)
+QString Entry::formatTimeSpent(const time_t timeSpent)
 {
-	const qlonglong mins = (timeSpent / 60) % 60;
-	const qlonglong hrs = timeSpent / 3600;
+	const time_t mins = (timeSpent / 60) % 60;
+	const time_t hrs = timeSpent / 3600;
 
 	QString str = QString("%1m").arg(mins);
 	if (hrs > 0)

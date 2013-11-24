@@ -22,5 +22,6 @@ SOURCES += \
 
 HEADERS +=\
 	core_global.h \
-    datafetcher.h \
+	datafetcher.h \
 	worklog.h \
+	credentialsprovider.h \

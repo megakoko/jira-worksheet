@@ -2,6 +2,7 @@
 
 #include "../core/datafetcher.h"
 #include "worksheetmodel.h"
+#include "credentialsdialog.h"
 
 #include "ui_worksheetwidget.h"
 
@@ -25,6 +26,8 @@ WorksheetWidget::WorksheetWidget(const QString& jiraHost, QWidget *parent)
 	ui->warningText->clear();
 	ui->warningLabel->setPixmap(style()->standardIcon(QStyle::SP_MessageBoxWarning).pixmap(ui->warningLabel->height()*0.7));
 
+	m_fetcher->setCredentialsProvider(this);
+
 	connect(m_fetcher.data(), SIGNAL(finished(bool)), SLOT(finished()));
 	connect(ui->startDate, SIGNAL(dateChanged(QDate)), SLOT(fetchWorksheet()));
 	connect(ui->endDate, SIGNAL(dateChanged(QDate)), SLOT(fetchWorksheet()));
@@ -42,6 +45,24 @@ void WorksheetWidget::setLogin(const QString& login)
 void WorksheetWidget::setPassword(const QString& password)
 {
 	m_fetcher->setPassword(password);
+}
+
+bool WorksheetWidget::getCredentials(QString *login, QString *password)
+{
+	bool result = false;
+
+	if(login != NULL && password != NULL)
+	{
+		CredentialsDialog d(this);
+		if(d.exec() == QDialog::Accepted)
+		{
+			result = true;
+			*login = d.login();
+			*password = d.password();
+		}
+	}
+
+	return result;
 }
 
 void WorksheetWidget::fetchWorksheet()

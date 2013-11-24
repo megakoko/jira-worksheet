@@ -17,6 +17,8 @@ namespace JiraWorksheet
 
 struct WorkLog;
 
+class CredentialsProvider;
+
 class CORESHARED_EXPORT DataFetcher : public QObject
 {
 	Q_OBJECT
@@ -32,6 +34,9 @@ public:
 
 	QString lastError() const { return m_lastError; }
 
+	// DataFetcher does not take ownership of the object.
+	void setCredentialsProvider(CredentialsProvider* provider) { m_credentialsProvider = provider; }
+
 private:
 	QNetworkAccessManager* m_manager;
 
@@ -43,6 +48,8 @@ private:
 	QSharedPointer<WorkLog> m_workLog;
 
 	QString m_lastError;
+
+	CredentialsProvider* m_credentialsProvider;
 
 private slots:
 	void processReply();

@@ -1,5 +1,8 @@
 #include "worksheetmodel.h"
 
+#include <QStringList>
+
+
 namespace JiraWorksheet
 {
 
@@ -68,10 +71,26 @@ QVariant WorksheetModel::data(const QModelIndex& index, int role) const
 				timeSpent += entry->timeSpent;
 		}
 
-		if(timeSpent == 0)
-			return QVariant();
-		else
+		if(timeSpent != 0)
 			return Entry::formatTimeSpent(timeSpent);
+
+	} break;
+
+	case Qt::ToolTipRole: {
+		const QSharedPointer<Issue> issue = m_data->issues.at(index.row());
+
+		const QDate& date = m_data->startDate.addDays(index.column());
+
+		QStringList comments;
+		foreach(const QSharedPointer<Entry> entry, issue->entries)
+		{
+			if(entry->timeUpdated.date() == date)
+				comments << (QChar(0x2022) + ' ' + entry->comment);
+		}
+
+		if(!comments.isEmpty())
+			return comments.join("\n");
+
 	} break;
 
 	case Qt::TextAlignmentRole:

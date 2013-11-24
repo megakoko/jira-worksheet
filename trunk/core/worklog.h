@@ -5,6 +5,8 @@
 #include <QString>
 #include <QDateTime>
 
+#include "timetype.h"
+
 template<class K, class T> class QMap;
 typedef QMap<QString, QVariant> QVariantMap;
 template<class T> class QList;
@@ -12,7 +14,6 @@ template<class T> class QList;
 
 namespace JiraWorksheet
 {
-typedef qlonglong time_t;
 
 struct CORESHARED_EXPORT Entry
 {
@@ -59,8 +60,11 @@ public:
 	const QDate endDate;
 	const QList<QSharedPointer<Issue> > issues;
 
+	time_t total();
+
 private:
 	static QList<QSharedPointer<Issue> > getIssues(const QVariantMap& workLogMap);
+	time_t totalTime;
 };
 
 QDebug operator<<(QDebug dbg, const WorkLog& log);

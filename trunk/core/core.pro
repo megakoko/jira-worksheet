@@ -25,3 +25,4 @@ HEADERS +=\
 	datafetcher.h \
 	worklog.h \
 	credentialsprovider.h \
+	timetype.h \

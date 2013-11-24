@@ -97,13 +97,19 @@ void WorksheetWidget::finished()
 
 	if(!m_fetcher->lastError().isNull())
 		setWarning(m_fetcher->lastError());
+
+	ui->totalTimeLabel->setText("Total time spent: " + Entry::formatTimeSpent(total()));
 }
 
 void WorksheetWidget::setWarning(const QString& message)
 {
-	ui->warningLabel->setHidden(message.isNull());
-	ui->warningText->setHidden(message.isNull());
+	ui->warningContainer->setHidden(message.isNull());
 	ui->warningText->setText(message);
+}
+
+time_t WorksheetWidget::total() const
+{
+	return m_fetcher->workLog()->total();
 }
 
 } // namespace

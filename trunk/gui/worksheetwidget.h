@@ -4,7 +4,7 @@
 #include <QDate>
 #include "gui_global.h"
 #include "../core/credentialsprovider.h"
-
+#include "../core/timetype.h"
 
 namespace Ui {
 class WorksheetWidget;
@@ -28,6 +28,8 @@ public:
 
 	// Reimp
 	bool getCredentials(QString *login, QString *password);
+
+	time_t total() const;
 
 public slots:
 	void fetchWorksheet();

@@ -56,6 +56,7 @@ WorkLog::WorkLog(const QVariantMap &map)
 	: startDate(QDateTime::fromMSecsSinceEpoch(map.value("startDate").toLongLong()).date())
 	, endDate(QDateTime::fromMSecsSinceEpoch(map.value("endDate").toLongLong()).date().addDays(-1))
 	, issues(getIssues(map))
+	, totalTime(0)
 {
 }
 
@@ -85,6 +86,18 @@ QList<QSharedPointer<JiraWorksheet::Issue> > WorkLog::getIssues(const QVariantMa
 	}
 
 	return issues;
+}
+
+time_t WorkLog::total()
+{
+	if(totalTime == 0)
+	{
+		foreach(const QSharedPointer<Issue> issue, issues)
+			foreach(const QSharedPointer<Entry> entry, issue->entries)
+				totalTime += entry->timeSpent;
+	}
+
+	return totalTime;
 }
 
 QDebug operator<<(QDebug dbg, const WorkLog& log)

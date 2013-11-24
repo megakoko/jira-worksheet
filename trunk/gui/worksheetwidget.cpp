@@ -72,6 +72,17 @@ void WorksheetWidget::fetchWorksheet()
 
 void WorksheetWidget::fetchWorksheet(const QDate& startDate, const QDate& endDate)
 {
+	disconnect(ui->startDate, SIGNAL(dateChanged(QDate)), this, SLOT(fetchWorksheet()));
+	disconnect(ui->endDate, SIGNAL(dateChanged(QDate)), this, SLOT(fetchWorksheet()));
+
+	ui->startDate->setDate(startDate);
+	ui->endDate->setDate(endDate);
+
+	connect(ui->startDate, SIGNAL(dateChanged(QDate)), SLOT(fetchWorksheet()));
+	connect(ui->endDate, SIGNAL(dateChanged(QDate)), SLOT(fetchWorksheet()));
+
+
+
 	m_fetcher->fetchWorksheet(startDate, endDate);
 	if(startDate > endDate)
 		setWarning("Start date is greater than end date");

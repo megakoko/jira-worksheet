@@ -3,6 +3,7 @@
 #include <QWidget>
 #include <QDate>
 #include "gui_global.h"
+#include "../core/credentialsprovider.h"
 
 
 namespace Ui {
@@ -14,7 +15,7 @@ namespace JiraWorksheet
 
 class DataFetcher;
 
-class GUISHARED_EXPORT WorksheetWidget : public QWidget
+class GUISHARED_EXPORT WorksheetWidget : public QWidget, public CredentialsProvider
 {
 	Q_OBJECT
 	
@@ -24,6 +25,9 @@ public:
 
 	void setLogin(const QString& login);
 	void setPassword(const QString& password);
+
+	// Reimp
+	bool getCredentials(QString *login, QString *password);
 
 public slots:
 	void fetchWorksheet();

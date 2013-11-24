@@ -12,6 +12,7 @@
 #include <QJson/Parser>
 
 #include "worklog.h"
+#include "credentialsprovider.h"
 
 namespace JiraWorksheet
 {
@@ -20,6 +21,7 @@ DataFetcher::DataFetcher(const QString &jiraHost, QObject* parent)
 	: QObject(parent)
 	, m_manager(new QNetworkAccessManager(this))
 	, m_host(jiraHost)
+	, m_credentialsProvider(NULL)
 {
 
 }
@@ -29,6 +31,16 @@ void DataFetcher::fetchWorksheet(const QDate &startDate, const QDate &endDate)
 	// Cleanup
 	m_workLog.clear();
 	m_lastError.clear();
+
+	if(m_credentialsProvider != NULL && (m_login.isNull() || m_password.isNull()))
+	{
+		QString newLogin, newPassword;
+		if(m_credentialsProvider->getCredentials(&newLogin, &newPassword))
+		{
+			m_login = newLogin;
+			m_password = newPassword;
+		}
+	}
 
 	QUrl url;
 	url.setScheme("https");
@@ -68,6 +80,13 @@ void DataFetcher::processReply()
 	{
 		replyIsValid = false;
 		m_lastError = reply->errorString();
+
+		// If we couldn't pass authentication...
+		if(reply->error() == QNetworkReply::AuthenticationRequiredError)
+		{
+			m_login.clear();
+			m_password.clear();
+		}
 	}
 	else if(!reply->header(QNetworkRequest::ContentTypeHeader).toString().contains("application/json"))
 	{

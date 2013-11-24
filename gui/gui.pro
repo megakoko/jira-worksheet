@@ -18,12 +18,15 @@ INCLUDEPATH += UI_DIR
 SOURCES += \
     worksheetwidget.cpp \
 	worksheetmodel.cpp \
+	credentialsdialog.cpp \
 
 HEADERS +=\
 	gui_global.h \
     worksheetwidget.h \
 	worksheetmodel.h \
+	credentialsdialog.h \
 
 FORMS += \
 	worksheetwidget.ui \
+	credentialsdialog.ui \
 

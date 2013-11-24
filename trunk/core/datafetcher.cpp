@@ -28,6 +28,7 @@ void DataFetcher::fetchWorksheet(const QDate &startDate, const QDate &endDate)
 {
 	// Cleanup
 	m_workLog.clear();
+	m_lastError.clear();
 
 	QUrl url;
 	url.setScheme("https");
@@ -40,10 +41,7 @@ void DataFetcher::fetchWorksheet(const QDate &startDate, const QDate &endDate)
 	url.addQueryItem("startDate", locale.toString(startDate, jiraDateFormat));
 	url.addQueryItem("endDate", locale.toString(endDate, jiraDateFormat));
 
-	qDebug() << url;
-
 	const QByteArray authorization = "Basic " + QString("%1:%2").arg(m_login).arg(m_password).toUtf8().toBase64();
-
 
 
 	QNetworkRequest req;
@@ -66,29 +64,32 @@ void DataFetcher::processReply()
 
 
 	bool replyIsValid = true;
-	if (!reply->header(QNetworkRequest::ContentTypeHeader).toString().contains("application/json"))
+	if(reply->error() != QNetworkReply::NoError)
+	{
 		replyIsValid = false;
+		m_lastError = reply->errorString();
+	}
+	else if(!reply->header(QNetworkRequest::ContentTypeHeader).toString().contains("application/json"))
+	{
+		replyIsValid = false;
+		m_lastError = "Invalid response received from Jira. User login and password might be incorrect.";
+	}
 	else
 	{
-		replyIsValid = processJson(reply->readAll());
+		QJson::Parser parser;
+		QVariant map = parser.parse(reply->readAll(), &replyIsValid);
+
+		m_workLog = QSharedPointer<WorkLog>(new WorkLog(map.toMap()));
+
+		if(!replyIsValid)
+			m_lastError = "Invalid JSON received.";
 	}
 
+	Q_ASSERT(replyIsValid || !m_lastError.isNull());
+	if(!replyIsValid && m_lastError.isNull())
+		m_lastError = "Unknown error";
 
-	qDebug() << "REPLY IS VALID =" << replyIsValid;
 	emit finished(replyIsValid);
-}
-
-bool DataFetcher::processJson(const QByteArray& json)
-{
-	bool jsonIsValid = true;
-
-
-	QJson::Parser parser;
-	QVariant map = parser.parse(json, &jsonIsValid);
-
-	m_workLog = QSharedPointer<WorkLog>(new WorkLog(map.toMap()));
-
-	return jsonIsValid;
 }
 
 } // namespace

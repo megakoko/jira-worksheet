@@ -30,9 +30,9 @@ public:
 
 	QSharedPointer<WorkLog> workLog() const { return m_workLog; }
 
-private:
-	bool processJson(const QByteArray& json);
+	QString lastError() const { return m_lastError; }
 
+private:
 	QNetworkAccessManager* m_manager;
 
 	QString m_login;
@@ -41,6 +41,8 @@ private:
 	QString m_host;
 
 	QSharedPointer<WorkLog> m_workLog;
+
+	QString m_lastError;
 
 private slots:
 	void processReply();

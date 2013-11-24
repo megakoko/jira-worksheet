@@ -64,7 +64,7 @@ QVariant WorksheetModel::data(const QModelIndex& index, int role) const
 
 		const QDate& date = m_data->startDate.addDays(index.column());
 
-		qlonglong timeSpent = 0;
+		time_t timeSpent = 0;
 		foreach(const QSharedPointer<Entry> entry, issue->entries)
 		{
 			if(entry->timeUpdated.date() == date)

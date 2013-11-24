@@ -26,6 +26,9 @@ DataFetcher::DataFetcher(const QString &jiraHost, QObject* parent)
 
 void DataFetcher::fetchWorksheet(const QDate &startDate, const QDate &endDate)
 {
+	// Cleanup
+	m_workLog.clear();
+
 	QUrl url;
 	url.setScheme("https");
 	url.setHost(m_host);
@@ -83,12 +86,7 @@ bool DataFetcher::processJson(const QByteArray& json)
 	QJson::Parser parser;
 	QVariant map = parser.parse(json, &jsonIsValid);
 
-	if (jsonIsValid)
-	{
-		WorkLog log(map.toMap());
-		qDebug() << log.startDate << log.endDate;
-		qDebug() << log;
-	}
+	m_workLog = QSharedPointer<WorkLog>(new WorkLog(map.toMap()));
 
 	return jsonIsValid;
 }

@@ -8,9 +8,14 @@ class QNetworkAccessManager;
 class QNetworkReply;
 class QDate;
 
+template<class T> class QSharedPointer;
+
+#include "worklog.h"
 
 namespace JiraWorksheet
 {
+
+struct WorkLog;
 
 class CORESHARED_EXPORT DataFetcher : public QObject
 {
@@ -23,6 +28,8 @@ public:
 
 	void fetchWorksheet(const QDate& startDate, const QDate& endDate);
 
+	QSharedPointer<WorkLog> workLog() const { return m_workLog; }
+
 private:
 	bool processJson(const QByteArray& json);
 
@@ -32,6 +39,8 @@ private:
 	QString m_password;
 
 	QString m_host;
+
+	QSharedPointer<WorkLog> m_workLog;
 
 private slots:
 	void processReply();

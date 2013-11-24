@@ -25,9 +25,13 @@ public:
 	void setLogin(const QString& login);
 	void setPassword(const QString& password);
 
+public slots:
+	void fetchWorksheet();
 	void fetchWorksheet(const QDate& startDate, const QDate& endDate);
 	
 private:
+	void setWarning(const QString& message);
+
 	QScopedPointer<Ui::WorksheetWidget> ui;
 
 	QScopedPointer<DataFetcher> m_fetcher;

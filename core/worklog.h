@@ -20,7 +20,7 @@ public:
 		  const qlonglong& timeUpdated, const qlonglong& timeCreated,
 		  const QString& authorUpdated, const QString& authorCreated);
 
-	QString formatTimeSpent() const;
+	static QString formatTimeSpent(const qlonglong timeSpent);
 
 	const QString comment;
 	const qlonglong timeSpent;

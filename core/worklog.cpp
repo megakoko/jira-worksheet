@@ -18,7 +18,7 @@ Entry::Entry(const QString& comment, const qlonglong& timeSpent,
 {
 }
 
-QString Entry::formatTimeSpent() const
+QString Entry::formatTimeSpent(const qlonglong timeSpent)
 {
 	const qlonglong mins = (timeSpent / 60) % 60;
 	const qlonglong hrs = timeSpent / 3600;
@@ -32,7 +32,7 @@ QString Entry::formatTimeSpent() const
 
 QDebug operator<<(QDebug dbg, const Entry& entry)
 {
-	dbg.nospace() << "  Timesheet entry: " << qPrintable(entry.formatTimeSpent()) << " - " << qPrintable(entry.comment);
+	dbg.nospace() << "  Timesheet entry: " << qPrintable(Entry::formatTimeSpent(entry.timeSpent)) << " - " << qPrintable(entry.comment);
 	return dbg.maybeSpace();
 }
 

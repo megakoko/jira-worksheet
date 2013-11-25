@@ -39,6 +39,7 @@ public:
 
 private:
 	QNetworkAccessManager* m_manager;
+	QNetworkReply* m_reply;
 
 	QString m_login;
 	QString m_password;

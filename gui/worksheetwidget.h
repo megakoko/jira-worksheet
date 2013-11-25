@@ -10,6 +10,8 @@ namespace Ui {
 class WorksheetWidget;
 }
 
+class QTimer;
+
 namespace JiraWorksheet
 {
 
@@ -40,7 +42,9 @@ private:
 
 	QScopedPointer<Ui::WorksheetWidget> ui;
 
-	QScopedPointer<DataFetcher> m_fetcher;
+	DataFetcher* m_fetcher;
+
+	QTimer* m_fetchTimer;
 
 private slots:
 	void finished();

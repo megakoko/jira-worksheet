@@ -20,6 +20,7 @@ namespace JiraWorksheet
 DataFetcher::DataFetcher(const QString &jiraHost, QObject* parent)
 	: QObject(parent)
 	, m_manager(new QNetworkAccessManager(this))
+	, m_reply(NULL)
 	, m_host(jiraHost)
 	, m_credentialsProvider(NULL)
 {
@@ -31,6 +32,14 @@ void DataFetcher::fetchWorksheet(const QDate &startDate, const QDate &endDate)
 	// Cleanup
 	m_workLog.clear();
 	m_lastError.clear();
+	if(m_reply != NULL)
+	{
+		QNetworkReply* oldReply = m_reply;
+		m_reply = NULL;
+
+		oldReply->abort();
+		oldReply->deleteLater();
+	}
 
 	if(m_credentialsProvider != NULL && (m_login.isNull() || m_password.isNull()))
 	{
@@ -61,53 +70,57 @@ void DataFetcher::fetchWorksheet(const QDate &startDate, const QDate &endDate)
 	req.setRawHeader("Authorization", authorization);
 	req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-	QNetworkReply* reply = m_manager->get(req);
-	connect(reply, SIGNAL(finished()), SLOT(processReply()));
+	m_reply = m_manager->get(req);
+	connect(m_reply, SIGNAL(finished()), SLOT(processReply()));
 }
 
 
 void DataFetcher::processReply()
 {
-	QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
-	if (reply == NULL)
+	if(sender() != m_reply)
 		return;
 
-	reply->deleteLater();
+	m_reply->deleteLater();
 
 
 	bool replyIsValid = true;
-	if(reply->error() != QNetworkReply::NoError)
+	if(m_reply->error() != QNetworkReply::NoError)
 	{
 		replyIsValid = false;
-		m_lastError = reply->errorString();
+		m_lastError = m_reply->errorString();
 
 		// If we couldn't pass authentication...
-		if(reply->error() == QNetworkReply::AuthenticationRequiredError)
+		if(m_reply->error() == QNetworkReply::AuthenticationRequiredError)
 		{
 			m_login.clear();
 			m_password.clear();
 		}
 	}
-	else if(!reply->header(QNetworkRequest::ContentTypeHeader).toString().contains("application/json"))
+	else if(!m_reply->header(QNetworkRequest::ContentTypeHeader).toString().contains("application/json"))
 	{
 		replyIsValid = false;
 		m_lastError = "Invalid response received from Jira. User login and password might be incorrect.";
 	}
 	else
 	{
+		const QByteArray& bytes = m_reply->readAll();
 		QJson::Parser parser;
-		QVariant map = parser.parse(reply->readAll(), &replyIsValid);
+		QVariant map = parser.parse(bytes, &replyIsValid);
 
 		m_workLog = QSharedPointer<WorkLog>(new WorkLog(map.toMap()));
 
 		if(!replyIsValid)
+		{
 			m_lastError = "Invalid JSON received.";
+			qWarning() << "JSON:" << bytes;
+		}
 	}
 
 	Q_ASSERT(replyIsValid || !m_lastError.isNull());
 	if(!replyIsValid && m_lastError.isNull())
 		m_lastError = "Unknown error";
 
+	m_reply = NULL;
 	emit finished(replyIsValid);
 }
 

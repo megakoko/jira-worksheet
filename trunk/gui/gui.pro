@@ -19,12 +19,14 @@ SOURCES += \
     worksheetwidget.cpp \
 	worksheetmodel.cpp \
 	credentialsdialog.cpp \
+	worksheetdelegate.cpp \
 
 HEADERS +=\
 	gui_global.h \
     worksheetwidget.h \
 	worksheetmodel.h \
 	credentialsdialog.h \
+	worksheetdelegate.h \
 
 FORMS += \
 	worksheetwidget.ui \

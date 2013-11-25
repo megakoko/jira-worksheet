@@ -3,6 +3,7 @@
 #include "../core/datafetcher.h"
 #include "worksheetmodel.h"
 #include "credentialsdialog.h"
+#include "worksheetdelegate.h"
 
 #include "ui_worksheetwidget.h"
 
@@ -17,6 +18,7 @@ WorksheetWidget::WorksheetWidget(const QString& jiraHost, QWidget *parent)
 {
 	ui->setupUi(this);
 	ui->tableView->setModel(new WorksheetModel(ui->tableView));
+	ui->tableView->setItemDelegate(new WorksheetDelegate(this));
 
 	const QDate& today = QDate::currentDate();
 	ui->startDate->setDate(today);

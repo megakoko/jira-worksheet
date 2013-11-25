@@ -1,7 +1,7 @@
 #include "worksheetmodel.h"
 
 #include <QStringList>
-
+#include <QFont>
 
 namespace JiraWorksheet
 {
@@ -20,7 +20,7 @@ void WorksheetModel::setWorkLog(const QSharedPointer<WorkLog>& workLog)
 
 int WorksheetModel::rowCount(const QModelIndex&) const
 {
-	return m_data.isNull() ? 0 : m_data->issues.size();
+	return m_data.isNull() ? 0 : (m_data->issues.size() + 1);
 }
 
 int WorksheetModel::columnCount(const QModelIndex&) const
@@ -39,12 +39,27 @@ QVariant WorksheetModel::headerData(int section, Qt::Orientation orientation, in
 		if(orientation == Qt::Horizontal)
 			return m_data->startDate.addDays(section);
 		else
-			return m_data->issues.at(section)->key;
+		{
+			if(section == (rowCount() - 1))
+				return "TOTAL";
+			else if(const QSharedPointer<Issue> issue = m_data->issues.value(section))
+				return issue->key;
+		}
 		break;
 
 	case Qt::ToolTipRole:
 		if(orientation == Qt::Vertical)
-			return m_data->issues.at(section)->summary;
+			if(const QSharedPointer<Issue> issue = m_data->issues.value(section))
+				return issue->summary;
+		break;
+
+	case Qt::FontRole:
+		if(orientation == Qt::Vertical && section == (rowCount()-1))
+		{
+			QFont font = QAbstractTableModel::headerData(section, orientation, role).value<QFont>();
+			font.setBold(true);
+			return font;
+		}
 		break;
 
 	}
@@ -60,41 +75,57 @@ QVariant WorksheetModel::data(const QModelIndex& index, int role) const
 	switch(role)
 	{
 	case Qt::DisplayRole: {
-		const QSharedPointer<Issue> issue = m_data->issues.at(index.row());
-
-		const QDate& date = m_data->startDate.addDays(index.column());
-
-		time_t timeSpent = 0;
-		foreach(const QSharedPointer<Entry> entry, issue->entries)
+		if(index.row() == (rowCount() - 1))
 		{
-			if(entry->timeUpdated.date() == date)
-				timeSpent += entry->timeSpent;
-		}
+			const QDate& date = m_data->startDate.addDays(index.column());
 
-		if(timeSpent != 0)
-			return Entry::formatTimeSpent(timeSpent);
+			time_t timeSpentInDay = 0;
+			foreach(const QSharedPointer<Issue> issue, m_data->issues)
+				foreach(const QSharedPointer<Entry> entry, issue->entries)
+				{
+					if(entry->timeUpdated.date() == date)
+						timeSpentInDay += entry->timeSpent;
+				}
+
+			if(timeSpentInDay != 0)
+				return Entry::formatTimeSpent(timeSpentInDay);
+		}
+		else if(const QSharedPointer<Issue> issue = m_data->issues.value(index.row()))
+		{
+			const QDate& date = m_data->startDate.addDays(index.column());
+
+			time_t timeSpent = 0;
+			foreach(const QSharedPointer<Entry> entry, issue->entries)
+			{
+				if(entry->timeUpdated.date() == date)
+					timeSpent += entry->timeSpent;
+			}
+
+			if(timeSpent != 0)
+				return Entry::formatTimeSpent(timeSpent);
+		}
 
 	} break;
 
-	case Qt::ToolTipRole: {
-		const QSharedPointer<Issue> issue = m_data->issues.at(index.row());
-
-		const QDate& date = m_data->startDate.addDays(index.column());
-
-		QStringList comments;
-		foreach(const QSharedPointer<Entry> entry, issue->entries)
+	case Qt::ToolTipRole:
+		if(const QSharedPointer<Issue> issue = m_data->issues.value(index.row()))
 		{
-			if(entry->timeUpdated.date() == date)
-				comments << (QChar(0x2022) + ' ' + entry->comment);
+			const QDate& date = m_data->startDate.addDays(index.column());
+
+			QStringList comments;
+			foreach(const QSharedPointer<Entry> entry, issue->entries)
+			{
+				if(entry->timeUpdated.date() == date)
+					comments << (QChar(0x2022) + ' ' + entry->comment);
+			}
+
+			if(!comments.isEmpty())
+				return comments.join("\n");
 		}
+		break;
 
-		if(!comments.isEmpty())
-			return comments.join("\n");
-
-	} break;
-
-	case Qt::TextAlignmentRole:
-		return QVariant(Qt::AlignRight | Qt::AlignVCenter);
+	case TotalRole:
+		return index.row() == (rowCount() - 1);
 
 	}
 

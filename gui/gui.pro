@@ -20,6 +20,7 @@ SOURCES += \
 	worksheetmodel.cpp \
 	credentialsdialog.cpp \
 	worksheetdelegate.cpp \
+	worksheetdialog.cpp \
 
 HEADERS +=\
 	gui_global.h \
@@ -27,6 +28,7 @@ HEADERS +=\
 	worksheetmodel.h \
 	credentialsdialog.h \
 	worksheetdelegate.h \
+	worksheetdialog.h \
 
 FORMS += \
 	worksheetwidget.ui \

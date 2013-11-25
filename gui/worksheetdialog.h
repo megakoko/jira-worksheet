@@ -2,13 +2,14 @@
 
 #include <QDialog>
 #include "../core/timetype.h"
+#include "gui_global.h"
 
 namespace JiraWorksheet
 {
 
 class WorksheetWidget;
 
-class WorksheetDialog : public QDialog
+class GUISHARED_EXPORT WorksheetDialog : public QDialog
 {
 	Q_OBJECT
 public:

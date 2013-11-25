@@ -22,6 +22,8 @@ WorksheetWidget::WorksheetWidget(const QString& jiraHost, QWidget *parent)
 	ui->startDate->setDate(today);
 	ui->endDate->setDate(today);
 
+	ui->totalTimeLabel->clear();
+	ui->warningContainer->hide();
 	ui->warningLabel->clear();
 	ui->warningText->clear();
 	ui->warningLabel->setPixmap(style()->standardIcon(QStyle::SP_MessageBoxWarning).pixmap(ui->warningLabel->height()*0.7));
@@ -109,7 +111,10 @@ void WorksheetWidget::setWarning(const QString& message)
 
 time_t WorksheetWidget::total() const
 {
-	return m_fetcher->workLog()->total();
+	if(QSharedPointer<WorkLog> worklog = m_fetcher->workLog())
+		return worklog->total();
+
+	return 0;
 }
 
 } // namespace

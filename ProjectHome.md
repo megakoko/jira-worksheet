@@ -1,0 +1,1 @@
+A Qt/C++ library for getting worksheet information (time spent) from Jira bug-tracker.
